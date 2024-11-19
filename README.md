@@ -59,10 +59,6 @@ If the **"Main Menu"** item appears in the player's hand after clicking in the m
 
 Any suggestions, bug reports, or pull requests are welcome!
 
-## License
-
-This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
-
 ## Author
 
 - **Maks**
