@@ -33,6 +33,7 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        getLogger().info("Player joined: " + player.getName());
         giveMenuItem(player);
     }
 
@@ -42,11 +43,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         ItemMeta meta = menuItem.getItemMeta();
         meta.setDisplayName(ChatColor.GOLD + "Main Menu");
         menuItem.setItemMeta(meta);
-
         // Place the item in slot 17 (top-right corner of main inventory)
-        if (!player.getInventory().contains(menuItem)) {
             player.getInventory().setItem(17, menuItem);
-        }
+
     }
 
     // Prevent dropping the Main Menu item

@@ -8,3 +8,4 @@ commands:
     usage: /suicide
   menu:
     description: Otwiera niestandardowe menu
+softdepend: [PlayerDataPlugin]
