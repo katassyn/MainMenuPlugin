@@ -62,31 +62,40 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
-        // Check if the event involves the Main Menu item
+        // Pobierz przedmiot na kursory i w slocie klikniętym
         ItemStack currentItem = event.getCurrentItem();
         ItemStack cursorItem = event.getCursor();
 
+        // Sprawdzamy oba przypadki: nether star w slocie lub na myszce
         if (isMainMenuItem(currentItem) || isMainMenuItem(cursorItem)) {
+            // Anulujemy interakcję
             event.setCancelled(true);
-            event.setCursor(null); // Dodaj tę linię
-            event.getView().setCursor(null); // Opcjonalnie, aby upewnić się, że kursor jest wyczyszczony
 
-            // If the player clicked on the Main Menu item, open the custom menu
+            // Wyczyszczenie kursora, jeśli jest na nim nether star
+            if (isMainMenuItem(cursorItem)) {
+                event.setCursor(null);
+                event.getView().setCursor(null);
+            }
+
+            // Jeśli kliknięto na nether star w ekwipunku, otwieramy menu
             if (isMainMenuItem(currentItem)) {
                 openCustomMenu(player);
             }
+
+            return; // Kończymy dalsze przetwarzanie zdarzenia
         }
 
-        // Handle clicks in the custom menu
+        // Obsługa kliknięć w customowym menu
         if (event.getView().getTitle().equals(ChatColor.BLUE + "Main Menu")) {
+            // Anulujemy interakcję w customowym menu
             event.setCancelled(true);
-            event.setCursor(null); // Dodaj tę linię
             ItemStack clickedItem = event.getCurrentItem();
 
             if (clickedItem == null || !clickedItem.hasItemMeta()) return;
 
             String displayName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
 
+            // Logika akcji w menu
             switch (displayName) {
                 case "Trinkets":
                     player.closeInventory();
@@ -113,6 +122,8 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
             }
         }
     }
+
+
 
 
     // Helper method to check if an item is the Main Menu item
