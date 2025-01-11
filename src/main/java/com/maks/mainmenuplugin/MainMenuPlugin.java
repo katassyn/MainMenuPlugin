@@ -62,8 +62,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
-        // Pobierz przedmiot na kursory i w slocie klikniętym
+        // Pobierz przedmiot w slocie klikniętym
         ItemStack currentItem = event.getCurrentItem();
+        // Pobierz przedmiot na kursorze
         ItemStack cursorItem = event.getCursor();
 
         // Sprawdzamy oba przypadki: nether star w slocie lub na myszce
@@ -71,18 +72,13 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
             // Anulujemy interakcję
             event.setCancelled(true);
 
-            // Wyczyszczenie kursora, jeśli jest na nim nether star
-            if (isMainMenuItem(cursorItem)) {
-                event.setCursor(null);
-                event.getView().setCursor(null);
-            }
-
-            // Jeśli kliknięto na nether star w ekwipunku, otwieramy menu
+            // Jeśli kliknięto w nether star w ekwipunku (a nie na kursorze), otwieramy menu
             if (isMainMenuItem(currentItem)) {
                 openCustomMenu(player);
             }
 
-            return; // Kończymy dalsze przetwarzanie zdarzenia
+            // Zwracamy, aby przerwać dalsze przetwarzanie
+            return;
         }
 
         // Obsługa kliknięć w customowym menu
@@ -91,7 +87,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
             event.setCancelled(true);
             ItemStack clickedItem = event.getCurrentItem();
 
-            if (clickedItem == null || !clickedItem.hasItemMeta()) return;
+            if (clickedItem == null || !clickedItem.hasItemMeta()) {
+                return;
+            }
 
             String displayName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
 
@@ -122,6 +120,7 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
             }
         }
     }
+
 
 
 
