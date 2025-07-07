@@ -7,5 +7,6 @@ commands:
     description: Kill yourself in-game.
     usage: /suicide
   menu:
-    description: Otwiera niestandardowe menu
+    description: Opens the custom main menu.
+    usage: /menu
 softdepend: [PlayerDataPlugin]

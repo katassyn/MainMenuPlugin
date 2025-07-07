@@ -18,10 +18,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainMenuPlugin extends JavaPlugin implements Listener {
 
+    // Debugging flag - set to 1 for debug mode, 0 for production
+    private int debuggingFlag = 0;
+
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
-        getLogger().info("MainMenuPlugin has been enabled!");
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] MainMenuPlugin has been enabled with debugging active!");
+        } else {
+            getLogger().info("MainMenuPlugin has been enabled!");
+        }
     }
 
     @Override
@@ -33,7 +40,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        getLogger().info("Player joined: " + player.getName());
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Player joined: " + player.getName());
+        }
         giveMenuItem(player);
     }
 
@@ -44,8 +53,10 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         meta.setDisplayName(ChatColor.GOLD + "Main Menu");
         menuItem.setItemMeta(meta);
         // Place the item in slot 17 (top-right corner of main inventory)
-            player.getInventory().setItem(17, menuItem);
-
+        player.getInventory().setItem(17, menuItem);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Gave menu item to player: " + player.getName());
+        }
     }
 
     // Prevent dropping the Main Menu item
@@ -54,6 +65,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         ItemStack item = event.getItemDrop().getItemStack();
         if (isMainMenuItem(item)) {
             event.setCancelled(true);
+            if (debuggingFlag == 1) {
+                getLogger().info("[DEBUG] Prevented player from dropping main menu item: " + event.getPlayer().getName());
+            }
         }
     }
 
@@ -74,6 +88,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
 
             // Jeśli kliknięto w nether star w ekwipunku (a nie na kursorze), otwieramy menu
             if (isMainMenuItem(currentItem)) {
+                if (debuggingFlag == 1) {
+                    getLogger().info("[DEBUG] Player clicked main menu item: " + player.getName());
+                }
                 openCustomMenu(player);
             }
 
@@ -93,6 +110,10 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
 
             String displayName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
 
+            if (debuggingFlag == 1) {
+                getLogger().info("[DEBUG] Player " + player.getName() + " clicked menu item: " + displayName);
+            }
+
             // Logika akcji w menu
             switch (displayName) {
                 case "Trinkets":
@@ -102,6 +123,14 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
                 case "Ingredient Pouch":
                     player.closeInventory();
                     player.performCommand("ingredient_pouch");
+                    break;
+                case "Skill Tree":
+                    player.closeInventory();
+                    player.performCommand("skilltree");
+                    break;
+                case "Ascendancy Skill Tree":
+                    player.closeInventory();
+                    player.performCommand("skilltree2");
                     break;
                 case "Premium Menu":
                     player.closeInventory();
@@ -121,10 +150,6 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         }
     }
 
-
-
-
-
     // Helper method to check if an item is the Main Menu item
     private boolean isMainMenuItem(ItemStack item) {
         if (item != null && item.hasItemMeta()) {
@@ -141,6 +166,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 player.setHealth(0.0);
+                if (debuggingFlag == 1) {
+                    getLogger().info("[DEBUG] Player used suicide command: " + player.getName());
+                }
                 return true;
             } else {
                 sender.sendMessage("Only players can execute this command.");
@@ -149,6 +177,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         } else if (label.equalsIgnoreCase("menu")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
+                if (debuggingFlag == 1) {
+                    getLogger().info("[DEBUG] Player used menu command: " + player.getName());
+                }
                 openCustomMenu(player);
                 return true;
             } else {
@@ -163,12 +194,20 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
     private void openCustomMenu(Player player) {
         Inventory customMenu = Bukkit.createInventory(null, 9, ChatColor.BLUE + "Main Menu");
 
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Opening custom menu for player: " + player.getName());
+        }
+
         // /trinkets
         ItemStack trinkets = new ItemStack(Material.FLOWER_BANNER_PATTERN);
         ItemMeta trinketsMeta = trinkets.getItemMeta();
         trinketsMeta.setDisplayName(ChatColor.GOLD + "Trinkets");
+        trinketsMeta.setLore(new java.util.ArrayList<String>());
         trinkets.setItemMeta(trinketsMeta);
         customMenu.setItem(0, trinkets);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Added Trinkets item to slot 0");
+        }
 
         // /ingredient_pouch
         ItemStack ingredientPouch = new ItemStack(Material.BUNDLE); // Use another material if BUNDLE is unavailable
@@ -176,20 +215,49 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         pouchMeta.setDisplayName(ChatColor.GREEN + "Ingredient Pouch");
         ingredientPouch.setItemMeta(pouchMeta);
         customMenu.setItem(1, ingredientPouch);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Added Ingredient Pouch item to slot 1");
+        }
 
-        // /premium_menu
+        // /skilltree - NEW
+        ItemStack skillTree = new ItemStack(Material.KNOWLEDGE_BOOK);
+        ItemMeta skillTreeMeta = skillTree.getItemMeta();
+        skillTreeMeta.setDisplayName(ChatColor.AQUA + "Skill Tree");
+        skillTree.setItemMeta(skillTreeMeta);
+        customMenu.setItem(3, skillTree);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Added Skill Tree item to slot 3");
+        }
+
+        // /skilltree 2 - NEW
+        ItemStack ascendancyTree = new ItemStack(Material.ENCHANTED_BOOK);
+        ItemMeta ascendancyTreeMeta = ascendancyTree.getItemMeta();
+        ascendancyTreeMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Ascendancy Skill Tree");
+        ascendancyTree.setItemMeta(ascendancyTreeMeta);
+        customMenu.setItem(4, ascendancyTree);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Added Ascendancy Skill Tree item to slot 4");
+        }
+
+        // /premium_menu - MOVED from slot 3 to slot 5
         ItemStack vipMenu = new ItemStack(Material.ANVIL);
         ItemMeta vipMeta = vipMenu.getItemMeta();
         vipMeta.setDisplayName(ChatColor.BLUE + "Premium Menu");
         vipMenu.setItemMeta(vipMeta);
-        customMenu.setItem(3, vipMenu);
+        customMenu.setItem(5, vipMenu);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Added Premium Menu item to slot 5");
+        }
 
-        // /trash
+        // /trash - MOVED from slot 5 to slot 7
         ItemStack trash = new ItemStack(Material.HOPPER);
         ItemMeta trashMeta = trash.getItemMeta();
         trashMeta.setDisplayName(ChatColor.GRAY + "Trash");
         trash.setItemMeta(trashMeta);
-        customMenu.setItem(5, trash);
+        customMenu.setItem(7, trash);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Added Trash item to slot 7");
+        }
 
         // /suicide
         ItemStack suicide = new ItemStack(Material.BONE);
@@ -197,6 +265,9 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         suicideMeta.setDisplayName(ChatColor.RED + "Suicide");
         suicide.setItemMeta(suicideMeta);
         customMenu.setItem(8, suicide);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Added Suicide item to slot 8");
+        }
 
         // Fill remaining slots with a filler item
         ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -207,9 +278,15 @@ public class MainMenuPlugin extends JavaPlugin implements Listener {
         for (int i = 0; i < customMenu.getSize(); i++) {
             if (customMenu.getItem(i) == null) {
                 customMenu.setItem(i, filler);
+                if (debuggingFlag == 1) {
+                    getLogger().info("[DEBUG] Added filler item to slot " + i);
+                }
             }
         }
 
         player.openInventory(customMenu);
+        if (debuggingFlag == 1) {
+            getLogger().info("[DEBUG] Menu opened successfully for player: " + player.getName());
+        }
     }
 }
